@@ -6,16 +6,25 @@ Complement script to the "Screenshot IINA" Apple Shortcuts.
 '''
 
 import subprocess
-from inspect import currentframe
+# from inspect import currentframe
 import os
 
 import time
 start_time = time.time()
 
+
+import time
+import os
+import subprocess
+
+from dotenv import load_dotenv
+load_dotenv()
+IINA_OUTPUT_FOLDER = os.getenv("IINA_OUTPUT_FOLDER")
+
 import sys
 import pymsgbox
 
-output_folder = '/Users/nic/Python/homee/notes/content/images'
+output_folder = ''
 
 ### Functions
 
@@ -29,7 +38,7 @@ def process_iina_screenshot(filepath, v=False, test=False):
     if test:
         pymsgbox.alert(f"\nStarting process_iina_screenshot with {filepath}\n")
 
-    image_path = filepath.replace(output_folder, '')[1:]
+    image_path = filepath.replace(IINA_OUTPUT_FOLDER, '')[1:]
     if v:
         pymsgbox.alert(f"\n{image_path=}")
     if image_path not in [None, 'None', '']:

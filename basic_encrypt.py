@@ -11,10 +11,6 @@ print(f"{ts_time} starting {os.path.basename(__file__)}")
 import time
 start_time = time.time()
 
-import sys
-sys.path.append("/Users/nic/Python/indeXee")
-sys.path.append("/Users/nic/Python/Scrapee")
-
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 print()

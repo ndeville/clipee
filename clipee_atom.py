@@ -2,7 +2,13 @@ from pandas.io.clipboard import clipboard_get
 import subprocess
 from datetime import datetime
 import time
-import subprocess    
+import subprocess   
+
+import os
+
+from dotenv import load_dotenv
+load_dotenv()
+PATH_PASTED_CLIPBOARD_FILE = os.getenv("PATH_PASTED_CLIPBOARD_FILE")
 
 start_time = time.time()
 
@@ -20,21 +26,18 @@ def write_to_clipboard(output):
 
 def clipee_atom(text, v=False):
 
-    file_path = f"/Users/nic/Dropbox/Atom/{date}.txt"
+    file_path = f"{PATH_PASTED_CLIPBOARD_FILE}{date}.txt"
 
     with open(file_path, 'w') as file:
         file.write(text)
 
     # path_to_atom = '/Applications/Atom.app'
-    path_to_atom = '/Applications/Sublime Text.app'
+    path_to_sublime = '/Applications/Sublime Text.app'
     path_to_file = 'file_path'
 
-    subprocess.call([path_to_atom, path_to_file])
+    subprocess.call([path_to_sublime, path_to_file])
     
 text = clipboard_get()
 print(f"\nProcessing: {repr(text)}\n")
 
 clipee_atom(text)
-
-run_time = round((time.time() - start_time), 1)
-print(f'finished in {run_time}s.\n')
