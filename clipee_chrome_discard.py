@@ -1,4 +1,6 @@
-# Copy URL from Chrome and add to text file for batch processing
+"""
+Copy URL from Chrome and add to text file for batch processing
+"""
 
 import time
 import os
@@ -8,9 +10,11 @@ from dotenv import load_dotenv
 load_dotenv()
 PATH_DISCARD_TEXT_FILE = os.getenv("PATH_DISCARD_TEXT_FILE")
 
-# for pasting
+## for pasting
 from pynput.keyboard import Key, Controller
 keyb = Controller()
+
+# Functions
 
 def get_clipboard_content():
     clipboard_content = subprocess.check_output(['pbpaste']).decode('utf-8')
@@ -31,14 +35,28 @@ def add_to_linkedin_discard_txt(url):
     with open(PATH_DISCARD_TEXT_FILE, 'a') as f:
         print(url, file=f)
 
-select_content_from_chrome_address_bar()
+def set_clipboard_value(value):
+    # Use subprocess to call the pbcopy command on macOS to set the clipboard value
+    subprocess.run("pbcopy", universal_newlines=True, input=value)
 
+# Main
+
+## keep old clipboard content
+old_clipboard_content = get_clipboard_content()
+
+## get URL from Chrome
+select_content_from_chrome_address_bar()
 time.sleep(0.2)
 
+## copy URL to clipboard
 copy()
 
+## get URL from clipboard
 url = get_clipboard_content()
-
 time.sleep(0.2)
 
+## add URL to text file
 add_to_linkedin_discard_txt(url)
+
+## restore old clipboard content
+set_clipboard_value(old_clipboard_content)
