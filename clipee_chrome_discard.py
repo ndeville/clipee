@@ -32,8 +32,9 @@ def copy():
             keyb.release('d')
 
 def add_to_linkedin_discard_txt(url):
-    with open(PATH_DISCARD_TEXT_FILE, 'a') as f:
-        print(url, file=f)
+    if url.startswith('https://www.linkedin.com'):
+        with open(PATH_DISCARD_TEXT_FILE, 'a') as f:
+            print(url, file=f)
 
 def set_clipboard_value(value):
     # Use subprocess to call the pbcopy command on macOS to set the clipboard value
