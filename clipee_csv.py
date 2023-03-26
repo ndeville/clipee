@@ -15,7 +15,7 @@ import csv
 import pymsgbox
 import os
 
-pymsgbox.alert(f"Starting {os.path.basename(__file__)}...")
+# pymsgbox.alert(f"Starting {os.path.basename(__file__)}...")
 
 count_col_csv = 0
 
