@@ -5,7 +5,7 @@ import os
 
 from dotenv import load_dotenv
 load_dotenv()
-PATH_CHROME_CLIPPER = os.getenv("PATH_CHROME_CLIPPER")
+PROJECT_FOLDER_EMAILEE = os.getenv("PROJECT_FOLDER_EMAILEE")
 
 import subprocess
 
