@@ -13,6 +13,13 @@ import requests
 from pynput.keyboard import Key, Controller
 keyb = Controller()
 
+import sys
+# sys.path.append(f"/Users/nic/Python/indeXee")
+sys.path.append(f"/Users/nic/Python/metaurl")
+
+
+from get.soup import without_js_rendering, with_js_rendering
+
 import time
 start_time = time.time()
 
@@ -96,62 +103,65 @@ def html_for_note(text, v=False):
 
         download_logo(domain, domain_name)
 
+        # try:
+        #     html = request.urlopen(url).read().decode('utf8')
+        #     if v:
+        #         print(f"\n{html=}")
+
         try:
-            html = request.urlopen(url).read().decode('utf8')
+            # soup = BeautifulSoup(html, "html.parser")
+
+            soup = without_js_rendering(url).soup
+
             if v:
-                print(f"\n{html=}")
+                print(f"\n{soup=}")
 
             try:
-                soup = BeautifulSoup(html, "html.parser")
+                title = soup.title.text
+                if '\n' in title:
+                    title = title.replace('\n', ' ').strip()
                 if v:
-                    print(f"\n{soup=}")
+                    print(f"\n{title=}")
 
                 try:
-                    title = soup.title.text
-                    if '\n' in title:
-                        title = title.replace('\n', ' ').strip()
+                    header = soup.find('h1').text
+                    if '\n' in header:
+                        header = header.replace('\n', ' ').strip()
                     if v:
-                        print(f"\n{title=}")
+                        print(f"{header=}")
+                    if header in title:
+                        header = domain
+                    output = f"<div class=\"link_border\"><div class=\"link_logo_box\"><img class=\"link_logo\" src=\"https://notes.nicolasdeville.com/images/logos/{domain_name}.png\" alt=\"logo\"/></div><div class=\"link_content\">\n<div class=\"link_title\">{title}</div>\n<div class=\"link_tagline\">{domain}</div>\n<div class=\"link_url\"><a href=\"{url}\" target=\"_blank\">{url}</a></div></div></div>\n"
 
-                    try:
-                        header = soup.find('h1').text
-                        if '\n' in header:
-                            header = header.replace('\n', ' ').strip()
-                        if v:
-                            print(f"{header=}")
-                        if header in title:
-                            header = domain
-                        output = f"<div class=\"link_border\"><div class=\"link_logo_box\"><img class=\"link_logo\" src=\"https://notes.nicolasdeville.com/images/logos/{domain_name}.png\" alt=\"logo\"/></div><div class=\"link_content\">\n<div class=\"link_title\">{title}</div>\n<div class=\"link_tagline\">{domain}</div>\n<div class=\"link_url\"><a href=\"{url}\" target=\"_blank\">{url}</a></div></div></div>\n"
-
-                    except Exception as e:
-                        print(f"\nheader ERROR: {e}")
-                        print(f"NO Header found, returning with Title only")
-                        output = f"<div class=\"link_border\"><div class=\"link_logo_box\"><img class=\"link_logo\" src=\"https://notes.nicolasdeville.com/images/logos/{domain_name}.png\" alt=\"logo\"/></div><div class=\"link_content\">\n<div class=\"link_title\">{title}</div>\n<div class=\"link_tagline\">{domain}</div>\n<div class=\"link_url\"><a href=\"{url}\" target=\"_blank\">{url}</a></div></div></div>\n"
-
-                    print(f'\nOutput:\n\n{output}\n')
-                    write_to_clipboard(output)
-                    paste()
-                
                 except Exception as e:
-                    print(f"\ntitle ERROR: {e}\nReturning empty div:")
-                    output = f"<div class=\"link_border\"><div class=\"link_logo_box\"><img class=\"link_logo\" src=\"https://notes.nicolasdeville.com/images/logos/{domain_name}.png\" alt=\"logo\"/></div><div class=\"link_content\">\n<div class=\"link_title\">{domain}</div>\n<div class=\"link_tagline\">{domain}</div>\n<div class=\"link_url\"><a href=\"{url}\" target=\"_blank\">{url}</a></div></div></div>\n"
-                    print(f'\nOutput:\n{output}\n')
-                    write_to_clipboard(output)
-                    paste()
+                    print(f"\nheader ERROR: {e}")
+                    print(f"NO Header found, returning with Title only")
+                    output = f"<div class=\"link_border\"><div class=\"link_logo_box\"><img class=\"link_logo\" src=\"https://notes.nicolasdeville.com/images/logos/{domain_name}.png\" alt=\"logo\"/></div><div class=\"link_content\">\n<div class=\"link_title\">{title}</div>\n<div class=\"link_tagline\">{domain}</div>\n<div class=\"link_url\"><a href=\"{url}\" target=\"_blank\">{url}</a></div></div></div>\n"
 
-            except Exception as e:
-                print(f"\soup ERROR: {e}\nReturning empty div:")
-                output = f"<div class=\"link_border\"><div class=\"link_logo_box\"><img class=\"link_logo\" src=\"https://notes.nicolasdeville.com/images/logos/{domain_name}.png\" alt=\"logo\"/></div><div class=\"link_content\">\n<div class=\"link_title\">{domain}</div>\n<div class=\"link_tagline\">{domain}</div>\n<div class=\"link_url\"><a href=\"{url}\" target=\"_blank\">{url}</a></div></div></div>\n"
                 print(f'\nOutput:\n\n{output}\n')
+                write_to_clipboard(output)
+                paste()
+            
+            except Exception as e:
+                print(f"\ntitle ERROR: {e}\nReturning empty div:")
+                output = f"<div class=\"link_border\"><div class=\"link_logo_box\"><img class=\"link_logo\" src=\"https://notes.nicolasdeville.com/images/logos/{domain_name}.png\" alt=\"logo\"/></div><div class=\"link_content\">\n<div class=\"link_title\">{domain}</div>\n<div class=\"link_tagline\">{domain}</div>\n<div class=\"link_url\"><a href=\"{url}\" target=\"_blank\">{url}</a></div></div></div>\n"
+                print(f'\nOutput:\n{output}\n')
                 write_to_clipboard(output)
                 paste()
 
         except Exception as e:
-            print(f"\nhtml ERROR: {e}\nReturning empty div:")
+            print(f"\soup ERROR: {e}\nReturning empty div:")
             output = f"<div class=\"link_border\"><div class=\"link_logo_box\"><img class=\"link_logo\" src=\"https://notes.nicolasdeville.com/images/logos/{domain_name}.png\" alt=\"logo\"/></div><div class=\"link_content\">\n<div class=\"link_title\">{domain}</div>\n<div class=\"link_tagline\">{domain}</div>\n<div class=\"link_url\"><a href=\"{url}\" target=\"_blank\">{url}</a></div></div></div>\n"
             print(f'\nOutput:\n\n{output}\n')
             write_to_clipboard(output)
             paste()
+
+        # except Exception as e:
+        #     print(f"\nhtml ERROR: {e}\nReturning empty div:")
+        #     output = f"<div class=\"link_border\"><div class=\"link_logo_box\"><img class=\"link_logo\" src=\"https://notes.nicolasdeville.com/images/logos/{domain_name}.png\" alt=\"logo\"/></div><div class=\"link_content\">\n<div class=\"link_title\">{domain}</div>\n<div class=\"link_tagline\">{domain}</div>\n<div class=\"link_url\"><a href=\"{url}\" target=\"_blank\">{url}</a></div></div></div>\n"
+        #     print(f'\nOutput:\n\n{output}\n')
+        #     write_to_clipboard(output)
+        #     paste()
 
 
 # text = clipboard_get()
@@ -164,3 +174,4 @@ html_for_note(text)
 
 run_time = round((time.time() - start_time), 3)
 print(f'finished in {run_time}s.\n')
+
