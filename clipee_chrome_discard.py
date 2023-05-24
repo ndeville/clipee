@@ -1,18 +1,29 @@
 """
-Copy URL from Chrome and add to text file for batch processing
+Copy URL from Chrome and update people table in DB
 """
 
 import time
+from datetime import datetime
 import os
 import subprocess
+import sqlite3
+
+import sys
+sys.path.append(f"/Users/nic/Python/indeXee")
 
 from dotenv import load_dotenv
 load_dotenv()
-PATH_DISCARD_TEXT_FILE = os.getenv("PATH_DISCARD_TEXT_FILE")
+# PATH_DISCARD_TEXT_FILE = os.getenv("PATH_DISCARD_TEXT_FILE")
+DB = os.getenv("DB_BTOB")
 
 ## for pasting
 from pynput.keyboard import Key, Controller
 keyb = Controller()
+
+# from DB.tools import update_record
+import my_utils
+
+from pync import Notifier
 
 # Functions
 
@@ -31,33 +42,93 @@ def copy():
             keyb.press('d')
             keyb.release('d')
 
-def add_to_linkedin_discard_txt(url):
-    if url.startswith('https://www.linkedin.com'):
-        with open(PATH_DISCARD_TEXT_FILE, 'a') as f:
-            print(url, file=f)
-
 def set_clipboard_value(value):
     # Use subprocess to call the pbcopy command on macOS to set the clipboard value
     subprocess.run("pbcopy", universal_newlines=True, input=value)
 
-# Main
+
+
+def get_people_rowid_from_linkedin_handle(linkedin_handle):
+    # Establish a database connection
+    conn = sqlite3.connect(DB)
+
+    # SQL query to get rowid from people table
+    sql = """
+        SELECT rowid FROM people
+        WHERE linkedin LIKE ?
+        """
+    # Execute the SQL query and retrieve the row
+    cursor = conn.execute(sql, ('%' + linkedin_handle + '%',))
+    row = cursor.fetchone()
+
+    # Close the database connection
+    conn.close()
+
+    # Check if a row was found and return the rowid
+    if row is not None:
+        rowid = row[0]
+        return rowid
+    else:
+        # Handle the case when no matching row is found
+        return None
+
+
+
+def update_db(linkedin_handle):
+
+    from DB.tools import update_record
+
+    try:
+
+        rowid = get_people_rowid_from_linkedin_handle(linkedin_handle)
+
+        update_record(DB, 'people', {
+            'rowid': rowid,
+            'discard': 1,
+            'notes': 'discarded manually',
+            'updated': f"{datetime.now().strftime('%Y-%m-%d %H:%M')}",
+            })
+        
+        Notifier.notify(
+            title='SUCCESS',
+            message=f'🟢🟢🟢',
+        )
+
+    except Exception as e:
+        
+        Notifier.notify(
+            title='FAIL - people table',
+            message=f'🔴🔴🔴 ERROR: {e}\nwith {linkedin_handle}',
+        )
+
+
+# MAIN
 
 ## keep old clipboard content
 old_clipboard_content = get_clipboard_content()
 
-## get URL from Chrome
 select_content_from_chrome_address_bar()
+
 time.sleep(0.2)
 
-## copy URL to clipboard
 copy()
 
-## get URL from clipboard
 url = get_clipboard_content()
-time.sleep(0.2)
 
-## add URL to text file
-add_to_linkedin_discard_txt(url)
+url = url.lower().strip()
+if url.endswith('/'):
+    url = url[:-1]
+
+linkedin_handle = my_utils.linkedin_handle_from_url(url)
+
+# Notifier.notify(
+#                 title='COPIED',
+#                 message=f'Linkedin handle {linkedin_handle} from {url}',
+#             )
+
+update_db(linkedin_handle)
 
 ## restore old clipboard content
 set_clipboard_value(old_clipboard_content)
+
+

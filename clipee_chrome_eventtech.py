@@ -1,4 +1,4 @@
-# # Copy URL from Chrome and add to Salestech vendors table
+# # Copy URL from Chrome and add to eventtech vendors table
 
 import sys
 sys.path.append(f"/Users/nic/Python/indeXee")
@@ -12,13 +12,12 @@ import subprocess
 
 from dotenv import load_dotenv
 load_dotenv()
-PATH_QUEUE_AI_FILE = os.getenv("PATH_QUEUE_AI_FILE")
+# PATH_QUEUE_AI_FILE = os.getenv("PATH_QUEUE_AI_FILE")
+DB = os.getenv("DB_BTOB")
 
 # for pasting
 from pynput.keyboard import Key, Controller
 keyb = Controller()
-
-DB = '/Users/nic/db/btob.db'
 
 # FUNCTIONS
 
@@ -38,6 +37,10 @@ def copy():
             keyb.release('d')
 
 
+def set_clipboard_value(value):
+    # Use subprocess to call the pbcopy command on macOS to set the clipboard value
+    subprocess.run("pbcopy", universal_newlines=True, input=value)
+
 
 def add_to_db(url):
 
@@ -46,12 +49,11 @@ def add_to_db(url):
 
     if url.startswith('http'):
 
-
-        # ADD to salestech table
+        # ADD to vendors table
 
         try:
 
-            create_record(DB, 'salestech', {
+            create_record(DB, 'vendors', {
                 'url': url,
                 'domain': my_utils.domain_from_url(url),
                 'notes': 'manual capture',
@@ -66,11 +68,9 @@ def add_to_db(url):
         except Exception as e:
             
             Notifier.notify(
-                title='FAIL',
+                title='FAIL - vendors table',
                 message=f'🔴🔴🔴 ERROR: {e}',
             )
-
-
 
         # ADD to companies table
 
@@ -97,6 +97,7 @@ def add_to_db(url):
             )
 
 
+
     else:
         
         Notifier.notify(
@@ -107,6 +108,9 @@ def add_to_db(url):
 
 
 # MAIN
+
+## keep old clipboard content
+old_clipboard_content = get_clipboard_content()
 
 select_content_from_chrome_address_bar()
 
@@ -128,4 +132,7 @@ Notifier.notify(
 # time.sleep(0.2)
 
 add_to_db(url)
+
+## restore old clipboard content
+set_clipboard_value(old_clipboard_content)
 
