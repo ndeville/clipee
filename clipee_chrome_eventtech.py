@@ -107,6 +107,72 @@ def add_to_db(url):
 
 
 
+
+
+
+
+# # 2023-06-02 18:32 FINALISE LOGIC TO UPDATE RECORDS
+
+# def add_to_db(url):
+
+#     from DB.tools import create_record, select_all_records, update_record
+#     import my_utils
+#     from datetime import datetime
+
+#     if url.startswith('http'):
+
+#         domain = my_utils.domain_from_url(url)
+#         clean_url = my_utils.clean_url(url)
+#         created = f"{datetime.now().strftime('%Y-%m-%d %H:%M')}"
+
+#         for table_name in ['vendors', 'companies']:
+#             try:
+#                 existing_records = select_all_records(DB, table_name, domain)
+
+#                 if existing_record is None:
+#                     # Record does not exist, create a new one
+#                     create_record(DB, table_name, {
+#                         'url': url if table_name == 'vendors' else clean_url,
+#                         'domain': domain,
+#                         'notes': 'manual capture',
+#                         'created': created,
+#                     })
+
+#                     Notifier.notify(
+#                         title=f'CREATED - {table_name} table',
+#                         message='🟢🟢🟢',
+#                     )
+
+#                 else:
+#                     if existing_record.url != url:
+#                         # URL has changed, update the record
+#                         update_record(DB, table_name, existing_record['id'], {
+#                             'url': url if table_name == 'vendors' else clean_url,
+#                             'created': created,
+#                         })
+
+#                     Notifier.notify(
+#                         title=f'UPDATED - {table_name} table',
+#                         message='🟢🟢🟢',
+#                     )
+
+#             except Exception as e:
+#                 Notifier.notify(
+#                     title=f'FAIL - {table_name} table',
+#                     message=f'🔴🔴🔴 ERROR: {e}',
+#                 )
+
+#     else:
+#         Notifier.notify(
+#                 title='FAIL',
+#                 message=f'🔴🔴🔴 NOT A URL {url}',
+#         )
+
+
+
+
+
+
 # MAIN
 
 ## keep old clipboard content
