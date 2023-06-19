@@ -42,131 +42,142 @@ def set_clipboard_value(value):
     subprocess.run("pbcopy", universal_newlines=True, input=value)
 
 
-def add_to_db(url):
-
-    from DB.tools import create_record
-    import my_utils
-
-    if url.startswith('http'):
-
-        # ADD to vendors table
-
-        try:
-
-            create_record(DB, 'vendors', {
-                'url': url,
-                'domain': my_utils.domain_from_url(url),
-                'notes': 'manual capture',
-                'created': f"{datetime.now().strftime('%Y-%m-%d %H:%M')}",
-                })
-            
-            Notifier.notify(
-                title='SUCCESS',
-                message=f'🟢🟢🟢',
-            )
-
-        except Exception as e:
-            
-            Notifier.notify(
-                title='FAIL - vendors table',
-                message=f'🔴🔴🔴 ERROR: {e}',
-            )
-
-        # ADD to companies table
-
-        try:
-            
-            create_record(DB, 'companies', {
-                'url': my_utils.clean_url(url),
-                'domain': my_utils.domain_from_url(url),
-                'notes': 'manual capture',
-                'created': f"{datetime.now().strftime('%Y-%m-%d %H:%M')}",
-                })
-            
-            Notifier.notify(
-                title='SUCCESS',
-                message=f'🟢🟢🟢',
-            )
-
-
-        except Exception as e:
-            
-            Notifier.notify(
-                title='FAIL - companies table',
-                message=f'🔴🔴🔴 ERROR: {e}',
-            )
-
-
-
-    else:
-        
-        Notifier.notify(
-                title='FAIL',
-                message=f'🔴🔴🔴 NOT A URL {url}',
-            )
-
-
-
-
-
-
-
-# # 2023-06-02 18:32 FINALISE LOGIC TO UPDATE RECORDS
-
 # def add_to_db(url):
 
-#     from DB.tools import create_record, select_all_records, update_record
+#     from DB.tools import create_record
 #     import my_utils
-#     from datetime import datetime
 
 #     if url.startswith('http'):
 
-#         domain = my_utils.domain_from_url(url)
-#         clean_url = my_utils.clean_url(url)
-#         created = f"{datetime.now().strftime('%Y-%m-%d %H:%M')}"
+#         # ADD to vendors table
 
-#         for table_name in ['vendors', 'companies']:
-#             try:
-#                 existing_records = select_all_records(DB, table_name, domain)
+#         try:
 
-#                 if existing_record is None:
-#                     # Record does not exist, create a new one
-#                     create_record(DB, table_name, {
-#                         'url': url if table_name == 'vendors' else clean_url,
-#                         'domain': domain,
-#                         'notes': 'manual capture',
-#                         'created': created,
-#                     })
+#             create_record(DB, 'vendors', {
+#                 'url': url,
+#                 'domain': my_utils.domain_from_url(url),
+#                 'notes': 'manual capture',
+#                 'created': f"{datetime.now().strftime('%Y-%m-%d %H:%M')}",
+#                 })
+            
+#             Notifier.notify(
+#                 title='SUCCESS',
+#                 message=f'🟢🟢🟢',
+#             )
 
-#                     Notifier.notify(
-#                         title=f'CREATED - {table_name} table',
-#                         message='🟢🟢🟢',
-#                     )
+#         except Exception as e:
+            
+#             Notifier.notify(
+#                 title='FAIL - vendors table',
+#                 message=f'🔴🔴🔴 ERROR: {e}',
+#             )
 
-#                 else:
-#                     if existing_record.url != url:
-#                         # URL has changed, update the record
-#                         update_record(DB, table_name, existing_record['id'], {
-#                             'url': url if table_name == 'vendors' else clean_url,
-#                             'created': created,
-#                         })
+#         # ADD to companies table
 
-#                     Notifier.notify(
-#                         title=f'UPDATED - {table_name} table',
-#                         message='🟢🟢🟢',
-#                     )
+#         try:
+            
+#             create_record(DB, 'companies', {
+#                 'url': my_utils.clean_url(url),
+#                 'domain': my_utils.domain_from_url(url),
+#                 'notes': 'manual capture',
+#                 'created': f"{datetime.now().strftime('%Y-%m-%d %H:%M')}",
+#                 })
+            
+#             Notifier.notify(
+#                 title='SUCCESS',
+#                 message=f'🟢🟢🟢',
+#             )
 
-#             except Exception as e:
-#                 Notifier.notify(
-#                     title=f'FAIL - {table_name} table',
-#                     message=f'🔴🔴🔴 ERROR: {e}',
-#                 )
+
+#         except Exception as e:
+            
+#             Notifier.notify(
+#                 title='FAIL - companies table',
+#                 message=f'🔴🔴🔴 ERROR: {e}',
+#             )
+
+
 
 #     else:
+        
 #         Notifier.notify(
 #                 title='FAIL',
 #                 message=f'🔴🔴🔴 NOT A URL {url}',
-#         )
+#             )
+
+
+
+
+
+
+
+# 2023-06-02 18:32 FINALISE LOGIC TO UPDATE RECORDS
+
+def add_to_db(url):
+
+    from DB.tools import create_record, select_all_records, update_record
+    import my_utils
+    from datetime import datetime
+
+    if url.startswith('http'):
+
+        domain = my_utils.domain_from_url(url)
+        clean_url = my_utils.clean_url(url)
+        timestamp = f"{datetime.now().strftime('%Y-%m-%d %H:%M')}"
+
+        for table_name in ['vendors', 'companies']:
+
+            try:
+
+                existing_records = select_all_records(DB, table_name, domain)
+
+                if len(existing_records) == 0:
+
+                    # Record does not exist, create a new one
+                    create_record(DB, table_name, {
+                        'url': url if table_name == 'vendors' else clean_url,
+                        'domain': domain,
+                        'notes': 'manual capture',
+                        'created': timestamp,
+                    })
+
+                    Notifier.notify(
+                        title=f'CREATED - {table_name} table',
+                        message='🟢🟢🟢',
+                    )
+
+                else:
+                    if existing_records[0].url != url:
+                        # URL has changed, update the record
+                        update_record(DB, table_name, {
+                            'rowid': existing_records[0].rowid,
+                            'url': url if table_name == 'vendors' else clean_url,
+                            'updated': timestamp,
+                        })
+
+                        Notifier.notify(
+                            title=f'UPDATED - {table_name} table\nwith {clean_url}',
+                            message='🔵🔵🔵',
+                        )
+
+                    else:
+                        # URL has not changed, do nothing
+                        Notifier.notify(
+                            title=f'NO CHANGE - {table_name} table',
+                            message='🟡🟡🟡',
+                        )
+
+            except Exception as e:
+                Notifier.notify(
+                    title=f'FAIL - {table_name} table',
+                    message=f'🔴🔴🔴 ERROR: {e}',
+                )
+
+    else:
+        Notifier.notify(
+                title='FAIL',
+                message=f'🔴🔴🔴 NOT A URL {url}',
+        )
 
 
 
@@ -174,6 +185,8 @@ def add_to_db(url):
 
 
 # MAIN
+
+
 
 ## keep old clipboard content
 old_clipboard_content = get_clipboard_content()
@@ -198,6 +211,7 @@ Notifier.notify(
 # time.sleep(0.2)
 
 add_to_db(url)
+
 
 ## restore old clipboard content
 set_clipboard_value(old_clipboard_content)
