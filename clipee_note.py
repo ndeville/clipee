@@ -17,6 +17,7 @@ import sys
 # sys.path.append(f"/Users/nic/Python/indeXee")
 sys.path.append(f"/Users/nic/Python/metaurl")
 
+import pymsgbox
 
 from get.soup import without_js_rendering, with_js_rendering
 
@@ -162,6 +163,9 @@ def html_for_note(text, v=False):
         #     print(f'\nOutput:\n\n{output}\n')
         #     write_to_clipboard(output)
         #     paste()
+
+    else:
+        pymsgbox.alert(text=f'URL {text} does not start with http', title='❌ http?', button='OK')
 
 
 # text = clipboard_get()
