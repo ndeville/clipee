@@ -11,6 +11,7 @@ load_dotenv()
 DB_TWITTER = os.getenv("DB_TWITTER")
 DB_BTOB = os.getenv("DB_BTOB")
 DB_MAILINGEE = os.getenv("DB_MAILINGEE")
+DB_EMAILEE = os.getenv("DB_EMAILEE")
 
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
@@ -72,6 +73,8 @@ def clean_email(clipboard_content):
 
 def mark_dne(email):
 
+    marked = False
+
     # Update email record in Mailingee table
 
     all_campaigns = my_utils.get_all_mailingee_campaigns()
@@ -90,6 +93,7 @@ def mark_dne(email):
         result_mailingee = cm.fetchone()
         db_mailingee.close()
         if result_mailingee is not None:
+
             rowid_mailingee = result_mailingee[0]
 
             print()
@@ -101,7 +105,11 @@ def mark_dne(email):
                     'updated': ts_db,
                 }
                 )
+            
+            marked = True
 
+    if not marked:
+        print("\nNo record found in Mainlingee tables.\n")
 
         # else:
         #     print(f"\nNo record found in {campaign} table.")
@@ -130,12 +138,15 @@ def mark_dne(email):
                 'updated': ts_db,
             }
             )
+        
+        marked = True
 
 
     else:
         print("\nNo record found in 'people' table.\n")
 
 
+    return marked
 
 
     # conn = sqlite3.connect(DB_BTOB)
@@ -161,7 +172,21 @@ if __name__ == '__main__':
 
     # print(f"\nclipboard_content: {clipboard_content}\n")
 
-    mark_dne(clean_email(clipboard_content))
+    mark_as_dne = mark_dne(clean_email(clipboard_content))
+
+    # Add to emailee.bounce_instantly table if not found in either Mailingee or People table
+    """
+    keeps track of emails that bounce from Instantly warmup
+    to be shared with Instantly 
+    """
+    if not mark_as_dne:
+
+        print(f"\nADDING TO EMAILEE.BOUNCE_INSTANTLY TABLE\n")
+
+        create_record(DB_EMAILEE, 'bounce_instantly', {
+                'email': clipboard_content,
+                'created': ts_db,
+        })
 
     print(f"\n\n\n")
 
