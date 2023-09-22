@@ -26,6 +26,8 @@ from DB.tools import select_all_records, update_record, create_record, delete_re
 import sys
 import sqlite3
 
+from instantly import update_lead_status
+
 # GLOBALS
 
 
@@ -77,6 +79,8 @@ def mark_dne(email):
 
     # Update email record in Mailingee table
 
+    print(f"\n\n==== MAILINGEE TABLES\n")
+
     all_campaigns = my_utils.get_all_mailingee_campaigns()
 
     for campaign in all_campaigns:
@@ -114,8 +118,9 @@ def mark_dne(email):
         # else:
         #     print(f"\nNo record found in {campaign} table.")
 
-
     # Update email record in people table
+
+    print(f"\n\n==== PEOPLE TABLE\n")
 
     db = sqlite3.connect(DB_BTOB)
     c = db.cursor()
@@ -145,6 +150,10 @@ def mark_dne(email):
     else:
         print("\nNo record found in 'people' table.\n")
 
+    # UPDATE INSTANTLY LEAD STATUS
+    print(f"\n\n==== INSTANTLY LEAD STATUS\n")
+
+    update_lead_status(email)
 
     return marked
 
@@ -181,7 +190,7 @@ if __name__ == '__main__':
     """
     if not mark_as_dne:
 
-        print(f"\nADDING TO EMAILEE.BOUNCE_INSTANTLY TABLE\n")
+        print(f"\n==== ADDING TO EMAILEE.BOUNCE_INSTANTLY TABLE\n")
 
         create_record(DB_EMAILEE, 'bounce_instantly', {
                 'email': clipboard_content,
