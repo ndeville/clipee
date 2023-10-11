@@ -46,10 +46,11 @@ for header in list_headers:
 
     x = header
 
-    if any(ele in header.lower() for ele in ['date', 'found', 'twitter', 'linkedin', 'country']):
-        header = f"{header} = row[{count}].value"
-    else:
-        header = f"{header} = row[{count}].value.strip()"
+    # if any(ele in header.lower() for ele in ['date', 'found', 'twitter', 'linkedin', 'country']):
+    #     header = f"{header} = row[{count}].value"
+    # else:
+    #     header = f"{header} = row[{count}].value.strip()"
+    header = f"{header} = row[{count}].value"
 
     if output == '':
         output = f"{header}"
