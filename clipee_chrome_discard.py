@@ -85,13 +85,16 @@ def update_db(linkedin_handle):
         update_record(DB, 'people', {
             'rowid': rowid,
             'discard': 1,
+            'lead_rank': 'D',
             'notes': 'discarded manually',
             'updated': f"{datetime.now().strftime('%Y-%m-%d %H:%M')}",
             })
         
+        linkedin_handle = my_utils.linkedin_handle_from_url(url)
+        
         Notifier.notify(
             title='SUCCESS',
-            message=f'🟢🟢🟢',
+            message=f'🟢🟢🟢 discarded\n{linkedin_handle}',
         )
 
     except Exception as e:

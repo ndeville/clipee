@@ -1,4 +1,4 @@
-# # Copy URL from Chrome and add to Salestech vendors table
+# # Copy URL from Chrome and add to Videotech vendors table
 
 import sys
 sys.path.append(f"/Users/nic/Python/indeXee")
@@ -47,11 +47,11 @@ def add_to_db(url):
     if url.startswith('http'):
 
 
-        # ADD to salestech table
+        # ADD to videotech table
 
         try:
 
-            create_record(DB, 'salestech', {
+            create_record(DB, 'videotech', {
                 'url': url,
                 'domain': my_utils.domain_from_url(url),
                 'notes': 'manual capture',
@@ -60,7 +60,7 @@ def add_to_db(url):
             
             Notifier.notify(
                 title='SUCCESS',
-                message=f'🟢🟢🟢\nadded to SALESTECH table in BTOB DB',
+                message=f'🟢🟢🟢\nadded to VIDEOTECH table in BTOB DB',
             )
 
         except Exception as e:
