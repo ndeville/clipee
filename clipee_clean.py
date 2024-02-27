@@ -61,7 +61,7 @@ def write_to_clipboard(output):
     process = subprocess.Popen(
         'pbcopy', env={'LANG': 'en_US.UTF-8'}, stdin=subprocess.PIPE)
     process.communicate(output.encode('utf-8'))
-    print(f"\nOUTPUT COPIED TO CLIPBOARD\n")
+    print(f"\nOUTPUT COPIED TO CLIPBOARD: {output}\n")
 
 
 do_not_clean = [
@@ -257,10 +257,12 @@ def clipee_processing(text):
         else:
             print(f"---\nLeaf link ALREADY in Grist\n---\n\n")
 
-    ## moved to clipee_html_for_note.py
-    # elif text.strip().startswith('http'):
-    #     print(f"{sep}Processing as NOTE LINK...\n")
-    #     html_for_note(text)
+    elif "nicolas.mediaspace.kaltura.com" in text:
+        k_parts = text.split('/')
+        for k in k_parts:
+            if k.startswith('1_'):
+                text = f"https://nicolas.mediaspace.kaltura.com/media/{k}"
+        write_to_clipboard(text)
 
     elif "?" in text:
         print(f"{sep}\nProcessing as URL CLEANING...\n")
