@@ -264,12 +264,39 @@ def clipee_processing(text):
                 text = f"https://nicolas.mediaspace.kaltura.com/media/{k}"
         write_to_clipboard(text)
 
-    elif "?" in text:
+    elif (text.startswith("http") and "?" in text):
         print(f"{sep}\nProcessing as URL CLEANING...\n")
         print(f'\nInput URL with query params: {type(text)}, {text}')
         short_url = cleanurl(text)
         write_to_clipboard(short_url)
         print(f'\nOutput short URL: {short_url}\n')
+    
+    elif "\n" in text:
+        print(f"{sep}\nProcessing as BREAKLINES CLEANING...\n")
+        print(f'\nInput URL with query params: {type(text)}, {text}')
+        clean_text = text.replace('\n', ' ')
+        write_to_clipboard(clean_text)
+        print(f'\nOutput short URL: {clean_text}\n')
+
+    elif ("@" in text and ">" in text):
+        print(f"{sep}\nProcessing as EMAIL CLEANING...\n")
+        print(f'\nInput Email: {type(text)}, {text}')
+        email = text.split('<')[1].replace('>', '')
+        write_to_clipboard(email)
+        print(f'\nOutput Email: {email}\n')
+
+    elif text.startswith("+"):
+        if '-' in text:
+            text = text.replace('-', '')
+        if '.' in text:
+            text = text.replace('.', '')
+        if '(' in text:
+            text = text.replace('(', '')
+        if ')' in text:
+            text = text.replace(')', '')
+        if ' ' in text:
+            text = text.replace(' ', '')
+        write_to_clipboard(text)
 
     else:
         print(f"\nNO LOGIC identified for this text.")
