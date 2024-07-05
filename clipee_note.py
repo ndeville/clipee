@@ -32,13 +32,6 @@ count_url = 0
 
 # FUNCTIONS
 
-# def separator(count=50, lines=3, symbol='='):
-#     separator = f"{symbol * count}" + '\n'
-#     separator = f"\n{separator * lines}"
-#     print(separator)
-
-# sep = separator()
-
 def get_clipboard_content():
     clipboard_content = subprocess.check_output(['pbpaste']).decode('utf-8')
     return clipboard_content
@@ -178,3 +171,4 @@ html_for_note(text)
 
 run_time = round((time.time() - start_time), 3)
 print(f'finished in {run_time}s.\n')
+
