@@ -39,8 +39,8 @@ for header in list_headers:
             header = 'last'
     if 'title' in header:
         header = 'title'
-    if 'phone' in header:
-        header = 'phone'
+    # if 'phone' in header:
+    #     header = 'phone'
 
     header = header.replace(' ', '_')
 
