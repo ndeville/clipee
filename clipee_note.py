@@ -43,6 +43,7 @@ def domain_from_url(url):
         domain = domain.replace('www.','')
     return domain
 
+
 def domain_name_from_url(url):
     o = tldextract.extract(url)
     domain_name = o.domain.lower()
@@ -61,7 +62,7 @@ def download_logo(domain, domain_name):
     else:
         print(f"Downloading logo for {domain}...")
         response = requests.get(f"https://logo.clearbit.com/{domain}")
-        
+
         if response.status_code == 200:
             with open(logo_path, "wb") as logo_file:
                 logo_file.write(response.content)
