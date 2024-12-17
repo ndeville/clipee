@@ -73,6 +73,24 @@ def get_people_rowid_from_linkedin_handle(linkedin_handle):
         return None
 
 
+def get_chrome_active_tab_url():
+    try:
+        script = '''
+        tell application "Google Chrome"
+            set activeTabUrl to URL of active tab of front window
+            return activeTabUrl
+        end tell
+        '''
+        result = subprocess.run(['osascript', '-e', script], capture_output=True, text=True)
+        url = result.stdout.strip()
+        print(f"\n🚹  Active tab URL: {url}")
+        return url
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+
+
 
 def update_db(linkedin_handle):
 
@@ -86,7 +104,7 @@ def update_db(linkedin_handle):
             'rowid': rowid,
             'discard': 1,
             'lead_rank': 'D',
-            'notes': 'discarded manually',
+            'notes': f"{datetime.now().strftime('%Y-%m-%d %H:%M')} discarded manually",
             'updated': f"{datetime.now().strftime('%Y-%m-%d %H:%M')}",
             })
         
@@ -107,22 +125,30 @@ def update_db(linkedin_handle):
 
 # MAIN
 
-## keep old clipboard content
-old_clipboard_content = get_clipboard_content()
+# ## keep old clipboard content
+# old_clipboard_content = get_clipboard_content()
 
-select_content_from_chrome_address_bar()
+# select_content_from_chrome_address_bar()
 
-time.sleep(0.2)
+# time.sleep(0.2)
 
-copy()
+# copy()
 
-url = get_clipboard_content()
+# url = get_clipboard_content()
 
-url = url.lower().strip()
-if url.endswith('/'):
-    url = url[:-1]
+# url = url.lower().strip()
+# if url.endswith('/'):
+#     url = url[:-1]
 
-linkedin_handle = my_utils.linkedin_handle_from_url(url)
+# linkedin_handle = my_utils.linkedin_handle_from_url(url)
+
+
+linkedin = get_chrome_active_tab_url()
+
+linkedin_handle = my_utils.linkedin_handle_from_url(linkedin)
+
+
+
 
 # Notifier.notify(
 #                 title='COPIED',
@@ -132,6 +158,6 @@ linkedin_handle = my_utils.linkedin_handle_from_url(url)
 update_db(linkedin_handle)
 
 ## restore old clipboard content
-set_clipboard_value(old_clipboard_content)
+# set_clipboard_value(old_clipboard_content)
 
 
