@@ -1,5 +1,5 @@
 """
-Copy URL from Chrome and update people table in DB
+Copy URL from Chrome and update people table in DB with vip status
 """
 
 import time
@@ -93,48 +93,31 @@ def get_chrome_active_tab_url():
 
 
 def update_db(linkedin_handle):
+
     from DB.tools import update_record
 
     try:
+
         rowid = get_people_rowid_from_linkedin_handle(linkedin_handle)
-        
-        # Get person details before updating
-        conn = sqlite3.connect(DB)
-        cursor = conn.execute("""
-            SELECT first, last, title, company, connected 
-            FROM people 
-            WHERE rowid = ?""", (rowid,))
-        person = cursor.fetchone()
-        conn.close()
 
         update_record(DB, 'people', {
             'rowid': rowid,
-            'discard': 1,
-            'lead_rank': 'D',
-            'notes': f"{datetime.now().strftime('%Y-%m-%d %H:%M')} discarded manually",
+            'vip': 1,
             'updated': f"{datetime.now().strftime('%Y-%m-%d %H:%M')}",
             })
         
-        # Format person details for notification
-        if person:
-            person_details = f"{linkedin_handle}\n\n{person[0]} {person[1]}\n{person[2]}\n{person[3]}\n\nconnected: {person[4]}"
-        else:
-            person_details = linkedin_handle
-
-        # Display success dialog and then close the tab when OK is clicked
-        os.system(f'''
-        osascript -e '
-            display dialog "🟢🟢🟢 DISCARDED\n\n{person_details}" with title "SUCCESS" buttons {{"OK"}} default button "OK"
-            tell application "System Events"
-                keystroke "w" using command down
-            end tell
-        '
-        ''')
+        # linkedin_handle = my_utils.linkedin_handle_from_url(url)
+        
+        Notifier.notify(
+            title='SUCCESS',
+            message=f'🟢🟢🟢 VIP:\n{linkedin_handle}',
+        )
 
     except Exception as e:
+        
         Notifier.notify(
             title='FAIL - people table',
-            message=f'🔴🔴🔴 ERROR: {e}\nwith {linkedin_handle}',
+            message=f'🔴🔴🔴 ERROR - vip: {e}\nwith {linkedin_handle}',
         )
 
 

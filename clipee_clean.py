@@ -146,6 +146,49 @@ def html_for_note(text, v=False):
         print(f'\nOutput:\n--------\n{output}--------\n')
         write_to_clipboard(output)
 
+
+import re
+
+def clean_markdown(text):
+    print("Processing as MARKDOWN CLEANING...\n")
+
+    # Remove bold and italic markers
+    text = re.sub(r'\*\*([^*]+)\*\*', r'\1', text)  # Bold (**text**)
+    text = re.sub(r'\*([^*]+)\*', r'\1', text)      # Italic (*text*)
+    text = re.sub(r'__([^_]+)__', r'\1', text)      # Bold (__text__)
+    text = re.sub(r'_([^_]+)_', r'\1', text)        # Italic (_text_)
+
+    # Remove headers
+    text = re.sub(r'#+\s*', '', text)
+
+    # Remove inline code and code blocks
+    text = re.sub(r'`([^`]+)`', r'\1', text)        # Inline code (`text`)
+    text = re.sub(r'```.*?```', '', text, flags=re.DOTALL)  # Code blocks
+
+    # Remove links but keep the text
+    text = re.sub(r'$begin:math:display$([^$end:math:display$]+)\]$begin:math:text$[^)]+$end:math:text$', r'\1', text)
+
+    # Remove images but keep the alt text
+    text = re.sub(r'!$begin:math:display$([^$end:math:display$]*)\]$begin:math:text$[^)]+$end:math:text$', r'\1', text)
+
+    # Remove blockquotes
+    text = re.sub(r'^>\s?', '', text, flags=re.MULTILINE)
+
+    # Remove horizontal rules
+    text = re.sub(r'(-{3,}|\*{3,})', '', text)
+
+    # Remove lists (ordered and unordered) but keep the text
+    text = re.sub(r'^\s*[-*+] ', '', text, flags=re.MULTILINE)  # Unordered lists
+    text = re.sub(r'^\s*\d+\.\s+', '', text, flags=re.MULTILINE)  # Ordered lists
+
+    # Remove extra spaces
+    text = re.sub(r'\n\s*\n', '\n', text).strip()
+
+    return text
+
+
+
+
 ### Switches
 
 def clipee_processing(text):
@@ -297,6 +340,10 @@ def clipee_processing(text):
         if ' ' in text:
             text = text.replace(' ', '')
         write_to_clipboard(text)
+
+    elif "**" in text:
+        print(f"{sep}\nProcessing as MARKDOWN CLEANING...\n")
+        write_to_clipboard(clean_markdown(text))
 
     else:
         print(f"\nNO LOGIC identified for this text.")
