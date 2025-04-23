@@ -1,13 +1,13 @@
 # from pandas.io.clipboard import clipboard_get
 import subprocess
 # from tldextract import extract
-import requests
+# import requests
 from datetime import datetime
 from bs4 import BeautifulSoup
 from urllib import request
 import tldextract
 import os
-import requests
+# import requests
 
 # for pasting
 from pynput.keyboard import Key, Controller
@@ -31,6 +31,23 @@ date = d.strftime('%Y%m%d-%H%M%S')
 count_url = 0
 
 # FUNCTIONS
+
+
+def get_chrome_active_tab_url():
+    try:
+        script = '''
+        tell application "Google Chrome"
+            set activeTabUrl to URL of active tab of front window
+            return activeTabUrl
+        end tell
+        '''
+        result = subprocess.run(['osascript', '-e', script], capture_output=True, text=True)
+        url = result.stdout.strip()
+        print(f"\n🚹  Active tab URL: {url}")
+        return url
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
 
 def get_clipboard_content():
     clipboard_content = subprocess.check_output(['pbpaste']).decode('utf-8')
@@ -61,14 +78,13 @@ def download_logo(domain, domain_name):
         print(f"Logo for {domain} already exists at {logo_path}")
     else:
         print(f"Downloading logo for {domain}...")
-        response = requests.get(f"https://logo.clearbit.com/{domain}")
-
-        if response.status_code == 200:
-            with open(logo_path, "wb") as logo_file:
-                logo_file.write(response.content)
+        curl_cmd = f"curl -s -o {logo_path} https://logo.clearbit.com/{domain}"
+        result = subprocess.run(curl_cmd, shell=True)
+        
+        if result.returncode == 0:
             print(f"Logo downloaded at {logo_path}")
         else:
-            print(f"Error downloading logo for {domain}. Status code: {response.status_code}")
+            print(f"Error downloading logo for {domain}. Curl returned code: {result.returncode}")
 
 
 def write_to_clipboard(output):
@@ -82,94 +98,79 @@ def paste():
         keyb.press('f')
         keyb.release('f')
 
+def get_webpage_content(url):
+    curl_cmd = f"curl -s -L {url}"
+    result = subprocess.run(curl_cmd, shell=True, capture_output=True, text=True)
+    return result.stdout
+
 # MAIN
 
-def html_for_note(text, v=False):
-    url = text.strip()
+def html_for_note(url, v=False):
+    print(f"\nℹ️  starting html_for_note for: {repr(url)}\n")
 
     if url.startswith('http'):
-
         domain = domain_from_url(url)
         domain_name = domain_name_from_url(url)
         if v:
-            print(f"\n{url=}")
+            print(f"\nhtml_for_note with {url=}")
             print(f"{domain=}")
             print(f"{domain_name=}")
 
         download_logo(domain, domain_name)
 
-        # try:
-        #     html = request.urlopen(url).read().decode('utf8')
-        #     if v:
-        #         print(f"\n{html=}")
-
         try:
-            # soup = BeautifulSoup(html, "html.parser")
-
-            soup = without_js_rendering(url).soup
-
+            html_content = get_webpage_content(url)
             if v:
-                print(f"\n{soup=}")
+                print(f"\nHTML content length: {len(html_content)}")
 
-            try:
-                title = soup.title.text
-                if '\n' in title:
-                    title = title.replace('\n', ' ').strip()
-                if v:
-                    print(f"\n{title=}")
-
-                try:
-                    header = soup.find('h1').text
-                    if '\n' in header:
-                        header = header.replace('\n', ' ').strip()
-                    if v:
-                        print(f"{header=}")
-                    if header in title:
-                        header = domain
-                    output = f"<div class=\"link_border\"><div class=\"link_logo_box\"><img class=\"link_logo\" src=\"https://notes.nicolasdeville.com/images/logos/{domain_name}.png\" alt=\"logo\"/></div><div class=\"link_content\">\n<div class=\"link_title\">{title}</div>\n<div class=\"link_tagline\">{domain}</div>\n<div class=\"link_url\"><a href=\"{url}\" target=\"_blank\">{url}</a></div></div></div>\n"
-
-                except Exception as e:
-                    print(f"\nheader ERROR: {e}")
-                    print(f"NO Header found, returning with Title only")
-                    output = f"<div class=\"link_border\"><div class=\"link_logo_box\"><img class=\"link_logo\" src=\"https://notes.nicolasdeville.com/images/logos/{domain_name}.png\" alt=\"logo\"/></div><div class=\"link_content\">\n<div class=\"link_title\">{title}</div>\n<div class=\"link_tagline\">{domain}</div>\n<div class=\"link_url\"><a href=\"{url}\" target=\"_blank\">{url}</a></div></div></div>\n"
-
-                print(f'\nOutput:\n\n{output}\n')
-                write_to_clipboard(output)
-                paste()
+            # Parse HTML with BeautifulSoup
+            soup = BeautifulSoup(html_content, 'html.parser')
             
-            except Exception as e:
-                print(f"\ntitle ERROR: {e}\nReturning empty div:")
-                output = f"<div class=\"link_border\"><div class=\"link_logo_box\"><img class=\"link_logo\" src=\"https://notes.nicolasdeville.com/images/logos/{domain_name}.png\" alt=\"logo\"/></div><div class=\"link_content\">\n<div class=\"link_title\">{domain}</div>\n<div class=\"link_tagline\">{domain}</div>\n<div class=\"link_url\"><a href=\"{url}\" target=\"_blank\">{url}</a></div></div></div>\n"
-                print(f'\nOutput:\n{output}\n')
-                write_to_clipboard(output)
-                paste()
+            # Extract og meta tags
+            og_title = soup.find('meta', property='og:title')
+            og_url = soup.find('meta', property='og:url')
+            og_description = soup.find('meta', property='og:description')
+            
+            # Get content from og tags or fallback to other methods
+            title = og_title['content'] if og_title else None
+            if not title:
+                title_tag = soup.find('title')
+                title = title_tag.text.strip() if title_tag else domain
+            
+            link_url = og_url['content'] if og_url else url
+            tagline = og_description['content'] if og_description else domain
 
-        except Exception as e:
-            print(f"\soup ERROR: {e}\nReturning empty div:")
-            output = f"<div class=\"link_border\"><div class=\"link_logo_box\"><img class=\"link_logo\" src=\"https://notes.nicolasdeville.com/images/logos/{domain_name}.png\" alt=\"logo\"/></div><div class=\"link_content\">\n<div class=\"link_title\">{domain}</div>\n<div class=\"link_tagline\">{domain}</div>\n<div class=\"link_url\"><a href=\"{url}\" target=\"_blank\">{url}</a></div></div></div>\n"
+            # Extract full text content
+            full_text = soup.get_text(separator=' ', strip=True)
+
+            output = f"<div class=\"link_border\"><div class=\"link_logo_box\"><img class=\"link_logo\" src=\"https://notes.nicolasdeville.com/images/logos/{domain_name}.png\" alt=\"logo\"/></div><div class=\"link_content\">\n<div class=\"link_title\">{title}</div>\n<div class=\"link_tagline\">{tagline}</div>\n<div class=\"link_url\"><a href=\"{link_url}\" target=\"_blank\">{link_url}</a></div></div></div>\n"
+
             print(f'\nOutput:\n\n{output}\n')
             write_to_clipboard(output)
-            paste()
+            return (output, full_text)
+            
+        except Exception as e:
+            print(f"\nError processing webpage: {e}\nReturning empty div:")
+            output = f"<div class=\"link_border\"><div class=\"link_logo_box\"><img class=\"link_logo\" src=\"https://notes.nicolasdeville.com/images/logos/{domain_name}.png\" alt=\"logo\"/></div><div class=\"link_content\">\n<div class=\"link_title\">{domain}</div>\n<div class=\"link_tagline\">{domain}</div>\n<div class=\"link_url\"><a href=\"{url}\" target=\"_blank\">{url}</a></div></div></div>\n"
+            if v:
+                print(f'\nOutput:\n\n{output}')
+            write_to_clipboard(output)
+            return (output, "")
 
-        # except Exception as e:
-        #     print(f"\nhtml ERROR: {e}\nReturning empty div:")
-        #     output = f"<div class=\"link_border\"><div class=\"link_logo_box\"><img class=\"link_logo\" src=\"https://notes.nicolasdeville.com/images/logos/{domain_name}.png\" alt=\"logo\"/></div><div class=\"link_content\">\n<div class=\"link_title\">{domain}</div>\n<div class=\"link_tagline\">{domain}</div>\n<div class=\"link_url\"><a href=\"{url}\" target=\"_blank\">{url}</a></div></div></div>\n"
-        #     print(f'\nOutput:\n\n{output}\n')
-        #     write_to_clipboard(output)
-        #     paste()
+    # else:
+    #     pymsgbox.alert(text=f'URL {text} does not start with http', title='❌ http?', button='OK')
 
-    else:
-        pymsgbox.alert(text=f'URL {text} does not start with http', title='❌ http?', button='OK')
+if __name__ == "__main__":
+    # text = get_clipboard_content()
+    url = get_chrome_active_tab_url()
+
+    html_for_note(url)
+
+    paste()
+
+    run_time = round((time.time() - start_time), 3)
+    print(f'finished in {run_time}s.\n')
 
 
-# text = clipboard_get()
-text = get_clipboard_content()
 
-
-print(f"\nProcessing: {repr(text)}\n")
-
-html_for_note(text)
-
-run_time = round((time.time() - start_time), 3)
-print(f'finished in {run_time}s.\n')
 
