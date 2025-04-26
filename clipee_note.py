@@ -69,7 +69,7 @@ def domain_name_from_url(url):
     return domain_name
 
 def download_logo(domain, domain_name):
-    print(f"\nChecking logo for {domain}...")
+    # print(f"\nChecking logo for {domain}...")
 
     logos_folder = "/Users/nic/Python/homee/notes/content/images/logos"
     logo_path = os.path.join(logos_folder, f"{domain_name}.png")
@@ -77,21 +77,21 @@ def download_logo(domain, domain_name):
     if os.path.exists(logo_path):
         print(f"Logo for {domain} already exists at {logo_path}")
     else:
-        print(f"Downloading logo for {domain}...")
+        # print(f"Downloading logo for {domain}...")
         curl_cmd = f"curl -s -o {logo_path} https://logo.clearbit.com/{domain}"
         result = subprocess.run(curl_cmd, shell=True)
         
         if result.returncode == 0:
-            print(f"Logo downloaded at {logo_path}")
+            print(f"✅ Logo downloaded at {logo_path}")
         else:
-            print(f"Error downloading logo for {domain}. Curl returned code: {result.returncode}")
+            print(f"❌ Error downloading logo for {domain}. Curl returned code: {result.returncode}")
 
 
 def write_to_clipboard(output):
     process = subprocess.Popen(
         'pbcopy', env={'LANG': 'en_US.UTF-8'}, stdin=subprocess.PIPE)
     process.communicate(output.encode('utf-8'))
-    print(f"\nOUTPUT COPIED TO CLIPBOARD\n")
+    print(f"📋 >>> OUTPUT COPIED TO CLIPBOARD\n")
 
 def paste():
     with keyb.pressed(Key.cmd):
@@ -145,7 +145,7 @@ def html_for_note(url, v=False):
 
             output = f"<div class=\"link_border\"><div class=\"link_logo_box\"><img class=\"link_logo\" src=\"https://notes.nicolasdeville.com/images/logos/{domain_name}.png\" alt=\"logo\"/></div><div class=\"link_content\">\n<div class=\"link_title\">{title}</div>\n<div class=\"link_tagline\">{tagline}</div>\n<div class=\"link_url\"><a href=\"{link_url}\" target=\"_blank\">{link_url}</a></div></div></div>\n"
 
-            print(f'\nOutput:\n\n{output}\n')
+            print(f'\nhtml_for_note:\n{output}')
             write_to_clipboard(output)
             return (output, full_text)
             
