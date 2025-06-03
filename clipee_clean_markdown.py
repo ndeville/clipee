@@ -55,7 +55,10 @@ def clean_markdown(text):
         # Remove inline code while preserving content
         line = re.sub(r'`([^`]+)`', r'\1', line)
         
-        # Remove links and images while keeping text/alt text
+        # Completely remove [oai...] links
+        line = re.sub(r'\[oai[^\]]*\]\([^)]*\)', '', line)
+
+        # Remove other links and images while keeping text/alt text
         line = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', line)  # Regular links
         line = re.sub(r'!\[([^\]]*)\]\([^)]+\)', r'\1', line)  # Images
         
