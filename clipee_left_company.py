@@ -59,31 +59,35 @@ def clean_email(clipboard_content):
     if verbose:
         print(f"\nclipboard_content: {repr(clipboard_content)}\n")
 
-    if '@' in clipboard_content:
-
-        # Cleaning
-
-        if '║' in clipboard_content:
-            clipboard_content = clipboard_content.replace('║', '')
-        if '>>> email' in clipboard_content:
-            clipboard_content = clipboard_content.replace('>>> email', '')
-        if ':' in clipboard_content:
-            clipboard_content = clipboard_content.replace(':', '')
-        if clipboard_content.startswith('mailto:'):
-            clipboard_content = clipboard_content.replace('mailto:', '')
-        if clipboard_content.startswith('mailto'):
-            clipboard_content = clipboard_content.replace('mailto', '')
-            
-        clipboard_content = clipboard_content.strip().lower()
-
-        print(f"\nclean clipboard_content: {repr(clipboard_content)}\n")
-
-        return clipboard_content
-    
-    else:
-
+    if '@' not in clipboard_content:
         return False
 
+    words = clipboard_content.split()
+    for word in words:
+        if '@' in word:
+            email = word # email now holds the most likely email segment
+            break
+
+    email = email.strip('[]()<>')
+
+    if '║' in email:
+        email = email.replace('║', '')
+    if '>>> email' in email: # This phrase is less likely after isolating a word
+        email = email.replace('>>> email', '')
+    
+    if ':' in email:
+        email = email.replace(':', '')
+    if email.startswith('mailto:'):
+        email = email.replace('mailto:', '')
+    if email.startswith('mailto'): # Kept for functional equivalence with original
+        email = email.replace('mailto', '')
+            
+    email = email.strip().lower()
+
+    if verbose:
+        print(f"\nclean clipboard_content: {repr(email)}\n")
+
+    return email
 
 
 

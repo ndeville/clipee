@@ -59,30 +59,35 @@ def clean_email(clipboard_content):
     if verbose:
         print(f"\nclipboard_content: {repr(clipboard_content)}\n")
 
-    if '@' in clipboard_content:
-
-        # Cleaning
-
-        if '║' in clipboard_content:
-            clipboard_content = clipboard_content.replace('║', '')
-        if '>>> email' in clipboard_content:
-            clipboard_content = clipboard_content.replace('>>> email', '')
-        if ':' in clipboard_content:
-            clipboard_content = clipboard_content.replace(':', '')
-        if clipboard_content.startswith('mailto:'):
-            clipboard_content = clipboard_content.replace('mailto:', '')
-        if clipboard_content.startswith('mailto'):
-            clipboard_content = clipboard_content.replace('mailto', '')
-            
-        clipboard_content = clipboard_content.strip().lower()
-
-        print(f"\nclean clipboard_content: {repr(clipboard_content)}\n")
-
-        return clipboard_content
-    
-    else:
-
+    if '@' not in clipboard_content:
         return False
+
+    words = clipboard_content.split()
+    for word in words:
+        if '@' in word:
+            email = word # email now holds the most likely email segment
+            break
+
+    email = email.strip('[]()<>')
+
+    if '║' in email:
+        email = email.replace('║', '')
+    if '>>> email' in email: # This phrase is less likely after isolating a word
+        email = email.replace('>>> email', '')
+    
+    if ':' in email:
+        email = email.replace(':', '')
+    if email.startswith('mailto:'):
+        email = email.replace('mailto:', '')
+    if email.startswith('mailto'): # Kept for functional equivalence with original
+        email = email.replace('mailto', '')
+            
+    email = email.strip().lower()
+
+    if verbose:
+        print(f"\nclean clipboard_content: {repr(email)}\n")
+
+    return email
 
 
 
@@ -122,7 +127,6 @@ def mark_email_bounced():
                 SET email_old = ?,
                     email = NULL,
                     email_status = NULL,
-                    connect25 = NULL,
                     updated = ?
                 WHERE rowid = ?""", (email, ts_db, rowid))
             db.commit()
@@ -133,7 +137,7 @@ def mark_email_bounced():
             # Display success dialog and then close the tab when OK is clicked
             os.system(f'''
             osascript -e '
-                display dialog "🟢🟢🟢 EMAIL BOUNCED\n\nChanges made for {email}:\n\n- Moved email to email_old\n- Set email to NULL\n- Set email_status to NULL\n- Set connect25 to NULL\n- Updated timestamp to {ts_db}" with title "SUCCESS" buttons {{"OK"}} default button "OK"
+                display dialog "🟢🟢🟢 EMAIL BOUNCED\n\nChanges made for {email}:\n\n- Moved email to email_old\n- Set email to NULL\n- Set email_status to NULL\nUpdated timestamp to {ts_db}" with title "SUCCESS" buttons {{"OK"}} default button "OK"
             '
             ''')
 
