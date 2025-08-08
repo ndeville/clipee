@@ -64,6 +64,9 @@ def clean_markdown(text):
         
         # Remove blockquotes but preserve text
         line = re.sub(r'^>\s?', '', line)
+
+        # Remove "• "
+        line = re.sub(r'^•\s?', '', line)
         
         # Preserve horizontal rules
         line = re.sub(r'^\s*[-*]{3,}\s*$', '---', line)
