@@ -68,6 +68,9 @@ def clean_markdown(text):
         # Remove "• "
         line = re.sub(r'^•\s?', '', line)
         
+        # Remove "   • "
+        line = re.sub(r'^   •\s?', '', line)
+
         # Preserve horizontal rules
         line = re.sub(r'^\s*[-*]{3,}\s*$', '---', line)
         
