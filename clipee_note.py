@@ -17,7 +17,8 @@ import sys
 # sys.path.append(f"/Users/nic/Python/indeXee")
 sys.path.append(f"/Users/nic/Python/metaurl")
 
-import pymsgbox
+# import pymsgbox
+from pync import Notifier
 
 from get.soup import without_js_rendering, with_js_rendering
 
@@ -93,10 +94,42 @@ def write_to_clipboard(output):
     process.communicate(output.encode('utf-8'))
     print(f"📋 >>> OUTPUT COPIED TO CLIPBOARD\n")
 
-def paste():
-    with keyb.pressed(Key.cmd):
-        keyb.press('f')
-        keyb.release('f')
+
+# def paste():
+#     # with keyb.pressed(Key.cmd):
+#     #     keyb.press('f')
+#     #     keyb.release('f')
+#     subprocess.run([
+#     "osascript", "-e",
+#     'tell application "System Events" to keystroke "f" using command down'
+# ])
+
+
+def paste(app_name="Visual Studio Code"):
+    """
+    app_name: "Visual Studio Code" or "Cursor"
+    Uses the app's Edit > Paste menu (robust to custom shortcuts).
+    """
+    applescript = f'''
+    tell application "{app_name}" to activate
+    tell application "System Events"
+        if exists process "{app_name}" then
+            try
+                click menu item "Paste" of menu "Edit" of menu bar 1 of process "{app_name}"
+            on error
+                keystroke "f" using command down
+            end try
+        else
+            keystroke "f" using command down
+        end if
+    end tell
+    '''
+    subprocess.run(["osascript", "-e", applescript], check=False)
+
+
+
+
+
 
 def get_webpage_content(url):
     curl_cmd = f"curl -s -L {url}"
@@ -146,27 +179,41 @@ def html_for_note(url, v=False):
             output = f"<div class=\"link_border\"><div class=\"link_logo_box\"><img class=\"link_logo\" src=\"https://notes.nicolasdeville.com/images/logos/{domain_name}.png\" alt=\"logo\"/></div><div class=\"link_content\">\n<div class=\"link_title\">{title}</div>\n<div class=\"link_tagline\">{tagline}</div>\n<div class=\"link_url\"><a href=\"{link_url}\" target=\"_blank\">{link_url}</a></div></div></div>\n"
 
             print(f'\nhtml_for_note:\n{output}')
+
+            Notifier.notify(
+                    title='✅ HTML for Note',
+                    message=f"<a href=\"{link_url}\">{link_url}</a>",
+                )
+
             write_to_clipboard(output)
             return (output, full_text)
             
         except Exception as e:
-            print(f"\nError processing webpage: {e}\nReturning empty div:")
-            output = f"<div class=\"link_border\"><div class=\"link_logo_box\"><img class=\"link_logo\" src=\"https://notes.nicolasdeville.com/images/logos/{domain_name}.png\" alt=\"logo\"/></div><div class=\"link_content\">\n<div class=\"link_title\">{domain}</div>\n<div class=\"link_tagline\">{domain}</div>\n<div class=\"link_url\"><a href=\"{url}\" target=\"_blank\">{url}</a></div></div></div>\n"
-            if v:
-                print(f'\nOutput:\n\n{output}')
-            write_to_clipboard(output)
-            return (output, "")
+            error_not_able_to_process = f"❌ Error processing webpage: {e}"
+            print(f"\n{error_not_able_to_process}")
+            Notifier.notify(
+                    title='❌ HTML for Note',
+                    message=error_not_able_to_process,
+                )
+
+            write_to_clipboard(error_not_able_to_process)
+            return (error_not_able_to_process, "")
 
     # else:
-    #     pymsgbox.alert(text=f'URL {text} does not start with http', title='❌ http?', button='OK')
+        pymsgbox.alert(text=f'URL {text} does not start with http', title='❌ http?', button='OK')
 
 if __name__ == "__main__":
     # text = get_clipboard_content()
     url = get_chrome_active_tab_url()
 
-    html_for_note(url)
+    note_html = html_for_note(url)
+
+
+
+    # print("pasting..")
 
     paste()
+    print("✅ pasted to Note.\n")
 
     run_time = round((time.time() - start_time), 3)
     print(f'finished in {run_time}s.\n')
