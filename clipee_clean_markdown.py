@@ -65,6 +65,12 @@ def clean_markdown(text):
         # Remove blockquotes but preserve text
         line = re.sub(r'^>\s?', '', line)
 
+        # Remove spaces before end dots
+        line = re.sub(r'\s+\.', '.', line)
+
+        # Remove "- " at start of line
+        line = re.sub(r'^-+\s?', '', line)
+
         # Remove "• "
         line = re.sub(r'^•\s?', '', line)
         
