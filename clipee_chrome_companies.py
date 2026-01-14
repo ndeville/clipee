@@ -15,6 +15,8 @@ load_dotenv()
 # PATH_QUEUE_AI_FILE = os.getenv("PATH_QUEUE_AI_FILE")
 DB = os.getenv("DB_BTOB")
 
+import my_utils
+
 # for pasting
 from pynput.keyboard import Key, Controller
 keyb = Controller()
@@ -84,16 +86,19 @@ def add_to_db(url):
 
 # MAIN
 
-## keep old clipboard content
-old_clipboard_content = get_clipboard_content()
+# ## keep old clipboard content
+# old_clipboard_content = get_clipboard_content()
 
-select_content_from_chrome_address_bar()
+# select_content_from_chrome_address_bar()
 
-time.sleep(0.2)
+# time.sleep(0.2)
 
-copy()
+# copy()
 
-url = get_clipboard_content()
+# url = get_clipboard_content()
+
+url = my_utils.get_chrome_active_tab_url()
+url = my_utils.clean_url(url)
 
 url = url.lower().strip()
 if url.endswith('/'):
@@ -109,5 +114,5 @@ Notifier.notify(
 add_to_db(url)
 
 ## restore old clipboard content
-set_clipboard_value(old_clipboard_content)
+# set_clipboard_value(old_clipboard_content)
 
