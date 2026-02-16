@@ -79,6 +79,9 @@ def clean_markdown(text):
 
         # Preserve horizontal rules
         line = re.sub(r'^\s*[-*]{3,}\s*$', '---', line)
+
+        # Remove "*" when it appears directly after ":"
+        line = re.sub(r':\s*\*+', ':', line)
         
         # Handle lists
         line = re.sub(r'^\s*\d+\.\s+', '- ', line)  # Convert numbered lists to dashes
