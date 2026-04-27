@@ -14,9 +14,10 @@ from dotenv import load_dotenv
 load_dotenv()
 PATH_QUEUE_AI_FILE = os.getenv("PATH_QUEUE_AI_FILE")
 
-# for pasting
-from pynput.keyboard import Key, Controller
-keyb = Controller()
+import my_utils
+# # for pasting
+# from pynput.keyboard import Key, Controller
+# keyb = Controller()
 
 DB = '/Users/nic/db/btob.db'
 
@@ -27,15 +28,16 @@ def get_clipboard_content():
     return clipboard_content
 
 
-def select_content_from_chrome_address_bar():
-    with keyb.pressed(Key.ctrl):
-            keyb.press('l')
-            keyb.release('l')
+# def select_content_from_chrome_address_bar():
+#     with keyb.pressed(Key.ctrl):
+#             keyb.press('l')
+#             keyb.release('l')
 
-def copy():
-    with keyb.pressed(Key.cmd):
-            keyb.press('d')
-            keyb.release('d')
+# def copy():
+#     with keyb.pressed(Key.cmd):
+#             keyb.press('d')
+#             keyb.release('d')
+
 
 
 
@@ -108,17 +110,7 @@ def add_to_db(url):
 
 # MAIN
 
-select_content_from_chrome_address_bar()
-
-time.sleep(0.2)
-
-copy()
-
-url = get_clipboard_content()
-
-url = url.lower().strip()
-if url.endswith('/'):
-    url = url[:-1]
+url = my_utils.get_chrome_active_tab_url()
 
 Notifier.notify(
                 title='COPIED',

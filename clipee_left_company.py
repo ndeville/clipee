@@ -210,13 +210,10 @@ def mark_left_company():
                     SET email_old = ?,
                         domain = NULL,
                         company = NULL,
-                        company_domain = NULL,
-                        comp1_name = NULL,
                         title = NULL,
                         lead_rank = NULL,
                         email = NULL,
                         email_status = NULL,
-                        connect25 = NULL,
                         updated = ?
                     WHERE rowid = ?""", (current_email, ts_db, rowid))
             else:
@@ -225,13 +222,10 @@ def mark_left_company():
                     UPDATE people 
                     SET domain = NULL,
                         company = NULL,
-                        company_domain = NULL,
-                        comp1_name = NULL,
                         title = NULL,
                         lead_rank = NULL,
                         email = NULL,
                         email_status = NULL,
-                        connect25 = NULL,
                         updated = ?
                     WHERE rowid = ?""", (ts_db, rowid))
             db.commit()
@@ -248,7 +242,6 @@ def mark_left_company():
                 "- Set lead_rank to NULL\n"
                 "- Set email to NULL\n"
                 "- Set email_status to NULL\n"
-                "- Set connect25 to NULL\n"
                 f"- Updated timestamp to {ts_db}",
                 title="SUCCESS"
             )
