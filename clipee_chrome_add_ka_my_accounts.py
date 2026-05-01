@@ -1,0 +1,120 @@
+# # Copy URL from Chrome and add to Salestech vendors table
+
+import sys
+sys.path.append(f"/Users/nic/Python/indeXee")
+
+from datetime import datetime
+from pync import Notifier
+
+import time
+import os
+import subprocess
+
+from dotenv import load_dotenv
+load_dotenv()
+
+import my_utils
+
+DB = '/Users/nic/db/btob.db'
+
+# FUNCTIONS
+
+def get_clipboard_content():
+    clipboard_content = subprocess.check_output(['pbpaste']).decode('utf-8')
+    return clipboard_content
+
+
+# def select_content_from_chrome_address_bar():
+#     with keyb.pressed(Key.ctrl):
+#             keyb.press('l')
+#             keyb.release('l')
+
+# def copy():
+#     with keyb.pressed(Key.cmd):
+#             keyb.press('d')
+#             keyb.release('d')
+
+
+
+
+def add_to_db(url):
+
+    from DB.tools import create_record
+    import my_utils
+
+    if url.startswith('http'):
+
+
+        # ADD to salestech table
+
+        try:
+
+            create_record(DB, 'ka_my_accounts', {
+                'url': url,
+                'domain': my_utils.domain_from_url(url),
+                'url': url,
+                'notes': 'manual capture',
+                'created': f"{datetime.now().strftime('%Y-%m-%d %H:%M')}",
+                })
+            
+            Notifier.notify(
+                title='SUCCESS',
+                message=f'🟢🟢🟢\nadded to ka_my_accounts table in BTOB DB',
+            )
+
+        except Exception as e:
+            
+            Notifier.notify(
+                title='FAIL',
+                message=f'🔴🔴🔴 ERROR: {e}',
+            )
+
+
+
+        # ADD to companies table
+
+        try:
+            
+            create_record(DB, 'companies', {
+                'url': my_utils.clean_url(url),
+                'domain': my_utils.domain_from_url(url),
+                'notes': 'manual capture',
+                'created': f"{datetime.now().strftime('%Y-%m-%d %H:%M')}",
+                })
+            
+            Notifier.notify(
+                title='SUCCESS',
+                message=f'🟢🟢🟢\nadded to COMPANIES table in BTOB DB',
+            )
+
+
+        except Exception as e:
+            
+            Notifier.notify(
+                title='FAIL - companies table',
+                message=f'🔴🔴🔴 ERROR: {e}',
+            )
+
+
+    else:
+        
+        Notifier.notify(
+                title='FAIL',
+                message=f'🔴🔴🔴 NOT A URL {url}',
+            )
+
+
+
+# MAIN
+
+url = my_utils.get_chrome_active_tab_url()
+
+# Notifier.notify(
+#                 title='COPIED',
+#                 message=f'{url}',
+#             )
+
+# time.sleep(0.2)
+
+add_to_db(url)
+
