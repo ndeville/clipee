@@ -22,7 +22,7 @@ keyb = Controller()
 # start_time = time.time()
 
 # import sys
-# sys.path.append("/Users/nic/Python/indeXee")
+# sys.path.append("/Users/nic/py/indeXee")
 # import grist_PE
 
 # d = datetime.now()
@@ -56,7 +56,7 @@ def paste():
 
 def get_category_and_page_name(path):
     # keep only category and page name
-    output = path.replace('/Users/nic/Python/homee/notes/content/articles/', '')
+    output = path.replace('/Users/nic/py/homee/notes/content/articles/', '')
     if " " in output:
         output = output.replace(' ', '-')
     # remove .md

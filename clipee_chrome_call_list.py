@@ -10,7 +10,7 @@ import subprocess
 import sqlite3
 
 import sys
-sys.path.append(f"/Users/nic/Python/indeXee")
+sys.path.append(f"/Users/nic/py/indeXee")
 
 from dotenv import load_dotenv
 load_dotenv()

@@ -10,8 +10,8 @@ import sys
 
 
 def generate_short_path(filepath, v=False, test=False):
-    if filepath.startswith('/Users/nic/Python/homee/notes/content/images/') and '/logos/' not in filepath:
-        filepath = filepath.replace('/Users/nic/Python/homee/notes/content/images/', '')
+    if filepath.startswith('/Users/nic/notes/site/content/images/') and '/logos/' not in filepath:
+        filepath = filepath.replace('/Users/nic/notes/site/content/images/', '')
     return filepath
     
 def generate_html_snippet(short_filepath, v=False, test=False):

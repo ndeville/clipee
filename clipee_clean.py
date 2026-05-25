@@ -14,7 +14,7 @@ from inspect import currentframe
 import string
 
 import sys
-sys.path.append("/Users/nic/Python/indeXee")
+sys.path.append("/Users/nic/py/indeXee")
 import grist_PE
 
 d = datetime.now()
@@ -80,7 +80,7 @@ def html_for_note(text, v=False):
     # download logo
     print(f"\nDownloading logo for {domain}...")
     response = requests.get(f"https://logo.clearbit.com/{domain}")
-    open(f"/Users/nic/Python/homee/notes/content/images/logos/{domain_name}.png", "wb").write(response.content)
+    open(f"/Users/nic/py/homee/notes/content/images/logos/{domain_name}.png", "wb").write(response.content)
     print(f"logo downloaded at images/logos/{domain_name}.png")
 
     try:

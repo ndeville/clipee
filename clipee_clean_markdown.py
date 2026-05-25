@@ -14,7 +14,7 @@ from inspect import currentframe
 import string
 
 import sys
-sys.path.append("/Users/nic/Python/indeXee")
+sys.path.append("/Users/nic/py/indeXee")
 import grist_PE
 
 d = datetime.now()

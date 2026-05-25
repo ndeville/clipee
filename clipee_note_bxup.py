@@ -14,8 +14,8 @@ from pynput.keyboard import Key, Controller
 keyb = Controller()
 
 import sys
-# sys.path.append(f"/Users/nic/Python/indeXee")
-sys.path.append(f"/Users/nic/Python/metaurl")
+# sys.path.append(f"/Users/nic/py/indeXee")
+sys.path.append(f"/Users/nic/py/metaurl")
 
 import pymsgbox
 
@@ -54,7 +54,7 @@ def domain_name_from_url(url):
 def download_logo(domain, domain_name):
     print(f"\nChecking logo for {domain}...")
 
-    logos_folder = "/Users/nic/Python/homee/notes/content/images/logos"
+    logos_folder = "/Users/nic/py/homee/notes/content/images/logos"
     logo_path = os.path.join(logos_folder, f"{domain_name}.png")
 
     if os.path.exists(logo_path):

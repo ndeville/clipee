@@ -13,8 +13,8 @@ from pynput.keyboard import Key, Controller
 keyb = Controller()
 
 import sys
-# sys.path.append(f"/Users/nic/Python/indeXee")
-# sys.path.append(f"/Users/nic/Python/metaurl")
+# sys.path.append(f"/Users/nic/py/indeXee")
+# sys.path.append(f"/Users/nic/py/metaurl")
 
 import pymsgbox
 

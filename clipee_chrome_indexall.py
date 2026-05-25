@@ -1,12 +1,12 @@
 # Copy URL from active Chrome tab and add to indexall inbox
 
 import sys
-sys.path.append("/Users/nic/Python/indeXee")
+sys.path.append("/Users/nic/py/indeXee")
 
 from pync import Notifier
 import my_utils
 
-INBOX_FILE = "/Users/nic/lab/indexall/inbox.md"
+INBOX_FILE = "/Users/nic/ai/indexall/inbox.md"
 INSERT_LINE = 5
 
 

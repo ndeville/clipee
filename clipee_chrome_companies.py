@@ -1,7 +1,7 @@
 # # Copy URL from Chrome and add to companies table in DB
 
 import sys
-sys.path.append(f"/Users/nic/Python/indeXee")
+sys.path.append(f"/Users/nic/py/indeXee")
 
 from datetime import datetime
 from pync import Notifier

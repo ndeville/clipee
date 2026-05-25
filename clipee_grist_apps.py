@@ -182,7 +182,7 @@ def add_app(text, v=v):
         print(f"\nLOGO\ndownloading for {domain} with {clearbit_path}")
         time.sleep(1)
         logo = requests.get(clearbit_path)
-        logo_path = f"/Users/nic/Python/homee/notes/content/images/logos/{slug}.png"
+        logo_path = f"/Users/nic/py/homee/notes/content/images/logos/{slug}.png"
         if v:
             f"#{get_linenumber()} {logo_path=}"
         open(logo_path, "wb").write(logo.content)
