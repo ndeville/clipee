@@ -20,9 +20,10 @@ DB_BTOB = os.getenv("DB_BTOB")
 # from DB.tools import select_all_records, update_record, create_record, delete_record
 # import sys
 import sqlite3
-import subprocess
 
 from pync import Notifier
+
+from chrome_tab import get_chrome_active_tab_url
 
 # from instantly import update_lead_status
 
@@ -39,24 +40,6 @@ verbose = True # verbose mode
 
 
 # FUNCTIONS
-
-def get_chrome_active_tab_url():
-    try:
-        script = '''
-        tell application "Google Chrome"
-            set activeTabUrl to URL of active tab of front window
-            return activeTabUrl
-        end tell
-        '''
-        result = subprocess.run(['osascript', '-e', script], capture_output=True, text=True)
-        url = result.stdout.strip()
-        print(f"\n🚹  Active tab URL: {url}")
-        return url
-    except Exception as e:
-        print(f"Error: {e}")
-        return None
-
-
 
 def get_clipboard_content():
     """
@@ -117,6 +100,11 @@ def mark_left_company():
     # clipboard_content = get_clipboard_content()
 
     clipboard_content = get_chrome_active_tab_url()
+
+    if clipboard_content is None:
+        return False
+
+    print(f"\n✅  Active tab URL: {clipboard_content}")
 
     # if "@" in clipboard_content:
     #     email = clean_email(clipboard_content)

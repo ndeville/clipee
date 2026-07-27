@@ -22,6 +22,8 @@ from pync import Notifier
 
 from get.soup import without_js_rendering, with_js_rendering
 
+from chrome_tab import get_chrome_active_tab_url
+
 import time
 start_time = time.time()
 
@@ -33,22 +35,6 @@ count_url = 0
 
 # FUNCTIONS
 
-
-def get_chrome_active_tab_url():
-    try:
-        script = '''
-        tell application "Google Chrome"
-            set activeTabUrl to URL of active tab of front window
-            return activeTabUrl
-        end tell
-        '''
-        result = subprocess.run(['osascript', '-e', script], capture_output=True, text=True)
-        url = result.stdout.strip()
-        print(f"\n🚹  Active tab URL: {url}")
-        return url
-    except Exception as e:
-        print(f"Error: {e}")
-        return None
 
 def get_clipboard_content():
     clipboard_content = subprocess.check_output(['pbpaste']).decode('utf-8')
@@ -205,6 +191,11 @@ def html_for_note(url, v=False):
 if __name__ == "__main__":
     # text = get_clipboard_content()
     url = get_chrome_active_tab_url()
+
+    if url is None:
+        sys.exit(1)
+
+    print(f"\n✅  Active tab URL: {url}")
 
     note_html = html_for_note(url)
 

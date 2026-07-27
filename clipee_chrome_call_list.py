@@ -12,6 +12,8 @@ import sqlite3
 import sys
 sys.path.append(f"/Users/nic/py/indeXee")
 
+from chrome_tab import get_chrome_active_tab_url
+
 from dotenv import load_dotenv
 load_dotenv()
 # PATH_DISCARD_TEXT_FILE = os.getenv("PATH_DISCARD_TEXT_FILE")
@@ -72,25 +74,6 @@ def get_people_rowid_from_linkedin_handle(linkedin_handle):
     else:
         # Handle the case when no matching row is found
         return None
-
-
-def get_chrome_active_tab_url():
-    try:
-        script = '''
-        tell application "Google Chrome"
-            set activeTabUrl to URL of active tab of front window
-            return activeTabUrl
-        end tell
-        '''
-        result = subprocess.run(['osascript', '-e', script], capture_output=True, text=True)
-        url = result.stdout.strip()
-        print(f"\n🚹  Active tab URL: {url}")
-        return url
-    except Exception as e:
-        print(f"Error: {e}")
-        return None
-
-
 
 
 def update_db(linkedin_handle):
@@ -158,6 +141,11 @@ def update_db(linkedin_handle):
 
 
 linkedin = get_chrome_active_tab_url()
+
+if linkedin is None:
+    sys.exit(1)
+
+print(f"\n✅  Active tab URL: {linkedin}")
 
 linkedin_handle = my_utils.linkedin_handle_from_url(linkedin)
 
