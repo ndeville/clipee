@@ -15,7 +15,6 @@ import string
 
 import sys
 sys.path.append("/Users/nic/py/indeXee")
-import grist_PE
 
 d = datetime.now()
 
@@ -278,27 +277,6 @@ def clipee_processing(text):
         text = text.replace('>>> ', '')
         print(f"\n{text=}\n")
         write_to_clipboard(text)
-
-    elif text.strip().startswith('https://www.leaf'):
-        print(f"{sep}Processing as LEAF LINK...\n")
-
-        existing_leaf_links = [x.leaf for x in grist_PE.Strains.fetch_table('Master')]
-
-        if text.strip() not in existing_leaf_links:
-
-            name_raw = text.replace('https://www.leafly.com/strains/', '')
-            if '-' in name_raw:
-                name_raw = name_raw.replace('-', ' ')
-            name = string.capwords(name_raw, sep=None)
-
-            grist_PE.Strains.add_records('Master', [
-                                            {   'leaf': text.strip(),
-                                                'name': name,
-                                                }
-                                        ])
-            print(f"\n+++\n{text.strip()} ADDED to Grist\n+++\n\n")
-        else:
-            print(f"---\nLeaf link ALREADY in Grist\n---\n\n")
 
     elif "nicolas.mediaspace.kaltura.com" in text:
         k_parts = text.split('/')
